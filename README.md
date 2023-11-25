@@ -30,28 +30,43 @@ library(quanteda)
 #> See https://quanteda.io for tutorials and examples.
 library(tokenvars)
 
-x <- tokens(c("this is great", "not so great man")) %>% tokens_add_tokenvars()
-x
+corp <- corpus(c(d1 = "spaCy is great at fast natural language processing.",
+                 d2 = "Mr. Smith spent two years in North Carolina."))
+
+tok <- tokens(corp) %>% tokens_add_tokenvars()
+tok
 #> Tokens consisting of 2 documents.
-#> text1 :
-#> [1] "this"  "is"    "great"
+#> d1 :
+#> [1] "spaCy"      "is"         "great"      "at"         "fast"      
+#> [6] "natural"    "language"   "processing" "."         
 #> 
-#> text2 :
-#> [1] "not"   "so"    "great" "man"
+#> d2 :
+#>  [1] "Mr"       "."        "Smith"    "spent"    "two"      "years"   
+#>  [7] "in"       "North"    "Carolina" "."
 ```
 
 ``` r
-tokenvars(x)
-#> $text1
-#>   token_id_ order_
-#> 1        t1      1
-#> 2        t2      2
-#> 3        t3      3
+tokenvars(tok) ## nothing to see here
+#> $d1
+#> data frame with 0 columns and 9 rows
 #> 
-#> $text2
-#>   token_id_ order_
-#> 1        t1      1
-#> 2        t2      2
-#> 3        t3      3
-#> 4        t4      4
+#> $d2
+#> data frame with 0 columns and 10 rows
+```
+
+``` r
+tokenvars(tok, "tag") <- list(c("NNP", "VBZ", "JJ", "IN", "JJ", "JJ", "NN", "NN", "."),
+                              c("NNP", ".", "NNP", "VBD", "CD", "NNS", "IN", "NNP", "NNP", "."))
+tokenvars(tok, docid = 'd1')
+#> $d1
+#>   tag
+#> 1 NNP
+#> 2 VBZ
+#> 3  JJ
+#> 4  IN
+#> 5  JJ
+#> 6  JJ
+#> 7  NN
+#> 8  NN
+#> 9   .
 ```

@@ -36,10 +36,20 @@ This is a basic example which shows you how to solve a common problem:
 library(quanteda)
 library(tokenvars)
 
-x <- tokens(c("this is great", "not so great man")) %>% tokens_add_tokenvars()
-x
+corp <- corpus(c(d1 = "spaCy is great at fast natural language processing.",
+                 d2 = "Mr. Smith spent two years in North Carolina."))
+
+tok <- tokens(corp) %>% tokens_add_tokenvars()
+tok
 ```
 
 ```{r example2}
-tokenvars(x)
+tokenvars(tok) ## nothing to see here
 ```
+
+```{r example3}
+tokenvars(tok, "tag") <- list(c("NNP", "VBZ", "JJ", "IN", "JJ", "JJ", "NN", "NN", "."),
+                              c("NNP", ".", "NNP", "VBD", "CD", "NNS", "IN", "NNP", "NNP", "."))
+tokenvars(tok, docid = 'd1')
+```
+
