@@ -12,13 +12,19 @@ select_tokenvars <- function(x, field = NULL, user = TRUE, system = FALSE, drop 
         x <- x[docid]
     }
     x <- lapply(x, remove_columns, user = user, system = system)
-    return(x)
+    if (is.null(field)) {
+        return(x)
+    }
+    if (length(field) == 1 && drop) {
+        return(lapply(x, `[[`, field))
+    }
+    return(lapply(x, `[`, field))
 }
 
 #' @export
 tokenvars <- function(x, field = NULL, docid = NULL, tokenid = NULL) {
     ## place holder; TODO field and tokenid
-    select_tokenvars(attr(x, "tokenvars"), field = field, docid = docid, tokenid = tokenid)
+    select_tokenvars(attr(x, "tokenvars"), field = field, docid = docid, tokenid = tokenid, drop = TRUE)
 }
 
 #' @export

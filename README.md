@@ -57,7 +57,10 @@ tokenvars(tok) ## nothing to see here
 ``` r
 tokenvars(tok, "tag") <- list(c("NNP", "VBZ", "JJ", "IN", "JJ", "JJ", "NN", "NN", "."),
                               c("NNP", ".", "NNP", "VBD", "CD", "NNS", "IN", "NNP", "NNP", "."))
-tokenvars(tok, docid = 'd1')
+```
+
+``` r
+tokenvars(tok)
 #> $d1
 #>   tag
 #> 1 NNP
@@ -69,4 +72,32 @@ tokenvars(tok, docid = 'd1')
 #> 7  NN
 #> 8  NN
 #> 9   .
+#> 
+#> $d2
+#>    tag
+#> 1  NNP
+#> 2    .
+#> 3  NNP
+#> 4  VBD
+#> 5   CD
+#> 6  NNS
+#> 7   IN
+#> 8  NNP
+#> 9  NNP
+#> 10   .
+```
+
+``` r
+tokenvars(tok, field = "tag")
+#> $d1
+#> [1] "NNP" "VBZ" "JJ"  "IN"  "JJ"  "JJ"  "NN"  "NN"  "."  
+#> 
+#> $d2
+#>  [1] "NNP" "."   "NNP" "VBD" "CD"  "NNS" "IN"  "NNP" "NNP" "."
+```
+
+``` r
+tokenvars(tok, field = "tag", docid = "d1")
+#> $d1
+#> [1] "NNP" "VBZ" "JJ"  "IN"  "JJ"  "JJ"  "NN"  "NN"  "."
 ```
