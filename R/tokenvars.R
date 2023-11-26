@@ -44,8 +44,28 @@ tokens_add_tokenvars <- function(x) {
     unclassed_x <- unclass(x)
     unclassed_x <- add_tokenid(unclassed_x)
     attr(unclassed_x, "tokenvars") <- make_tokenvars(unclassed_x)
-    class(unclassed_x) <- c("tokens")
+    class(unclassed_x) <- c("tokens_with_tokenvars")
     return(unclassed_x)
+}
+
+#' @importFrom quanteda as.tokens
+#' @method as.tokens tokens_with_tokenvars
+#' @export
+as.tokens.tokens_with_tokenvars <- function(x, remove_tokenvars = TRUE, ...) {
+    if (remove_tokenvars) {
+        attr(x, "tokenvars") <- NULL
+    }
+    class(x) <- "tokens"
+    return(x)
+}
+
+#' @export
+print.tokens_with_tokenvars <- function(x, max_ndoc = quanteda::quanteda_options("print_tokens_max_ndoc"),
+               max_ntoken = quanteda::quanteda_options("print_tokens_max_ntoken"),
+               show_summary = quanteda::quanteda_options("print_tokens_summary"), ...) {
+    ## TODO
+    print(as.tokens(x, remove_tokenvars = FALSE), max_ndoc = max_ndoc, max_ntoken = max_ntoken, show_summary = show_summary)
+    cat("With Token Variables.\n")
 }
 
 make_tokenvars <- function(unclassed_x) {
@@ -74,6 +94,5 @@ pp <- function(x, max_ndoc = quanteda::quanteda_options("print_tokens_max_ndoc")
     if (is.null(attr(x, "tokenvars"))) {
         print(x, max_ndoc = max_ndoc, max_ntoken = max_ntoken, show_summary = show_summary, ...)
         return(invisible(NULL))
-    }
-    
+    }    
 }
