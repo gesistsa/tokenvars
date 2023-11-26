@@ -60,12 +60,72 @@ as.tokens.tokens_with_tokenvars <- function(x, remove_tokenvars = TRUE, ...) {
 }
 
 #' @export
+#' @method docvars tokens_with_tokenvars
+#' @importFrom quanteda docvars
+docvars.tokens_with_tokenvars <- function(x, field = NULL) {
+    return(docvars(as.tokens(x, remove_tokenvars = FALSE), field = field))
+}
+
+print_item <- function(x, flatten, tokenids) {
+    for (i in seq_along(x)) {
+        cat("[", tokenids[i], "] ", x[i], " (", flatten[i], ") ", sep = "")
+    }
+}
+
+flat_tokenvars <- function(df) {
+    vapply(seq_len(nrow(df)), function(y) paste(as.character(df[y,]), collapse = "|"), "")
+}
+
+#' @export
 print.tokens_with_tokenvars <- function(x, max_ndoc = quanteda::quanteda_options("print_tokens_max_ndoc"),
                max_ntoken = quanteda::quanteda_options("print_tokens_max_ntoken"),
                show_summary = quanteda::quanteda_options("print_tokens_summary"), ...) {
-    ## TODO
-    print(as.tokens(x, remove_tokenvars = FALSE), max_ndoc = max_ndoc, max_ntoken = max_ntoken, show_summary = show_summary)
-    cat("With Token Variables.\n")
+    ## modified from quanteda::print.tokens
+    ##print(as.tokens(x, remove_tokenvars = FALSE), max_ndoc = max_ndoc, max_ntoken = max_ntoken, show_summary = show_summary)
+    ndoc <- length(x)
+    docvars <- docvars(x)
+    xtokenvars <- tokenvars(x)
+    if (max_ndoc < 0) {
+        max_ndoc <- ndoc
+    }
+    if (show_summary) {
+        cat("Tokens consisting of ", format(ndoc, big.mark = ","), " document",
+            if (ndoc != 1L) "s" else "", sep = "")
+        if (ncol(docvars)) {
+            cat(" and ", format(ncol(docvars), big.mark = ","), " docvar",
+                if (ncol(docvars) != 1L) "s" else "", sep = "")
+        }
+        cat(".\n")
+        if (ncol(xtokenvars[[1]])) {
+            cat("Token variables: (", paste(names(xtokenvars[[1]]), collapse = "|"), ").\n", sep = "")
+        }
+    }
+    if (max_ndoc > 0 && ndoc > 0) {
+        subsetted_x <- head(x, max_ndoc)
+        xtokenvars <- head(xtokenvars, max_ndoc)
+        docids <- paste0(names(subsetted_x), " :")
+        types <- c("", attr(x, "types"))
+        len <- lengths(subsetted_x)
+        if (max_ntoken < 0) {
+            max_ntoken <- max(len)
+        }
+        tokens_to_display <- lapply(unclass(subsetted_x), function(y) types[head(y, max_ntoken) + 1])
+        flatten_tokenvars <- lapply(xtokenvars, flat_tokenvars)
+        tokenids <- lapply(subsetted_x, names)
+        for (i in seq_along(docids)) {
+            cat(docids[i], "\n", sep = "")
+            print_item(tokens_to_display[[i]], flatten_tokenvars[[i]], tokenids[[i]])
+            if (len[i] > max_ntoken) {
+                cat("{ ... and ",  format(len[i] - max_ntoken, big.mark = ","), " more }\n", sep = "")
+            }
+            cat("\n", sep = "")
+        }
+        ndoc_rem <- ndoc - max_ndoc
+        if (ndoc_rem > 0) {
+            cat("{ reached max_ndoc ... ", format(ndoc_rem, big.mark = ","), " more document",
+                if (ndoc_rem > 1) "s", " }\n", sep = "")
+        }
+    }
 }
 
 make_tokenvars <- function(unclassed_x) {
@@ -85,14 +145,4 @@ add_tokenid <- function(unclassed_x) {
         attr(unclassed_x[[i]], "names") <- paste0("t", seq_along(unclassed_x[[i]]))
     }
     return(unclassed_x)
-}
-
-pp <- function(x, max_ndoc = quanteda::quanteda_options("print_tokens_max_ndoc"),
-               max_ntoken = quanteda::quanteda_options("print_tokens_max_ntoken"),
-               show_summary = quanteda::quanteda_options("print_tokens_summary"), ...) {
-    ## Pretty print; probably I can't hijack quanteda::print.tokens
-    if (is.null(attr(x, "tokenvars"))) {
-        print(x, max_ndoc = max_ndoc, max_ntoken = max_ntoken, show_summary = show_summary, ...)
-        return(invisible(NULL))
-    }    
 }

@@ -55,13 +55,17 @@ tokenvars(tok, "lemma") <- list(c("spaCy", "be", "great", "at", "fast", "natural
 ```
 
 ```{r example4}
-tokenvars(tok)
+tok
 ```
 
 ```{r example5}
-tokenvars(tok, field = "tag")
+tokenvars(tok)
 ```
 
 ```{r example6}
+tokenvars(tok, field = "tag")
+```
+
+```{r example7}
 tokenvars(tok, field = "lemma", docid = "d2")
 ```
