@@ -37,9 +37,9 @@ tok <- tokens(corp) %>% tokens_add_tokenvars()
 tok
 #> Tokens consisting of 2 documents.
 #> d1 :
-#> t1>"spaCy"t2>"is"t3>"great"t4>"at"t5>"fast"t6>"natural"t7>"language"t8>"processing"t9>"."
+#> t1>"spaCy" t2>"is" t3>"great" t4>"at" t5>"fast" t6>"natural" t7>"language" t8>"processing" t9>"." 
 #> d2 :
-#> t1>"Mr"t2>"."t3>"Smith"t4>"spent"t5>"two"t6>"years"t7>"in"t8>"North"t9>"Carolina"t10>"."
+#> t1>"Mr" t2>"." t3>"Smith" t4>"spent" t5>"two" t6>"years" t7>"in" t8>"North" t9>"Carolina" t10>"."
 ```
 
 ``` r

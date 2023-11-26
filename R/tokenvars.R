@@ -70,8 +70,9 @@ print_item <- function(x, flatten, tokenids) {
     for (i in seq_along(x)) {
         cat(tokenids[i], ">\"", x[i], "\"", sep = "")
         if (flatten[i] != "") {
-            cat("(", flatten[i], ") ", sep = "")
+            cat("(", flatten[i], ")", sep = "")
         }
+        cat(" ")
     }
 }
 
