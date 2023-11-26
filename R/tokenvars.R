@@ -68,7 +68,10 @@ docvars.tokens_with_tokenvars <- function(x, field = NULL) {
 
 print_item <- function(x, flatten, tokenids) {
     for (i in seq_along(x)) {
-        cat("[", tokenids[i], "] ", x[i], " (", flatten[i], ") ", sep = "")
+        cat(tokenids[i], ">\"", x[i], "\"", sep = "")
+        if (flatten[i] != "") {
+            cat("(", flatten[i], ") ", sep = "")
+        }
     }
 }
 
