@@ -50,6 +50,8 @@ tokenvars(tok) ## nothing to see here
 ```{r example3}
 tokenvars(tok, "tag") <- list(c("NNP", "VBZ", "JJ", "IN", "JJ", "JJ", "NN", "NN", "."),
                               c("NNP", ".", "NNP", "VBD", "CD", "NNS", "IN", "NNP", "NNP", "."))
+tokenvars(tok, "lemma") <- list(c("spaCy", "be", "great", "at", "fast", "natural", "language", "processing", "."),
+                                c("Mr", ".", "Smith", "spend", "two", "year", "in", "North", "Carolina", "."))
 ```
 
 ```{r example4}
@@ -61,5 +63,5 @@ tokenvars(tok, field = "tag")
 ```
 
 ```{r example6}
-tokenvars(tok, field = "tag", docid = "d1")
+tokenvars(tok, field = "lemma", docid = "d2")
 ```

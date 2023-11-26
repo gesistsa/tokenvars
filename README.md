@@ -42,7 +42,9 @@ tok
 #> 
 #> d2 :
 #>  [1] "Mr"       "."        "Smith"    "spent"    "two"      "years"   
-#>  [7] "in"       "North"    "Carolina" "."
+#>  [7] "in"       "North"    "Carolina" "."       
+#> 
+#> With Token Variables.
 ```
 
 ``` r
@@ -57,34 +59,36 @@ tokenvars(tok) ## nothing to see here
 ``` r
 tokenvars(tok, "tag") <- list(c("NNP", "VBZ", "JJ", "IN", "JJ", "JJ", "NN", "NN", "."),
                               c("NNP", ".", "NNP", "VBD", "CD", "NNS", "IN", "NNP", "NNP", "."))
+tokenvars(tok, "lemma") <- list(c("spaCy", "be", "great", "at", "fast", "natural", "language", "processing", "."),
+                                c("Mr", ".", "Smith", "spend", "two", "year", "in", "North", "Carolina", "."))
 ```
 
 ``` r
 tokenvars(tok)
 #> $d1
-#>   tag
-#> 1 NNP
-#> 2 VBZ
-#> 3  JJ
-#> 4  IN
-#> 5  JJ
-#> 6  JJ
-#> 7  NN
-#> 8  NN
-#> 9   .
+#>   tag      lemma
+#> 1 NNP      spaCy
+#> 2 VBZ         be
+#> 3  JJ      great
+#> 4  IN         at
+#> 5  JJ       fast
+#> 6  JJ    natural
+#> 7  NN   language
+#> 8  NN processing
+#> 9   .          .
 #> 
 #> $d2
-#>    tag
-#> 1  NNP
-#> 2    .
-#> 3  NNP
-#> 4  VBD
-#> 5   CD
-#> 6  NNS
-#> 7   IN
-#> 8  NNP
-#> 9  NNP
-#> 10   .
+#>    tag    lemma
+#> 1  NNP       Mr
+#> 2    .        .
+#> 3  NNP    Smith
+#> 4  VBD    spend
+#> 5   CD      two
+#> 6  NNS     year
+#> 7   IN       in
+#> 8  NNP    North
+#> 9  NNP Carolina
+#> 10   .        .
 ```
 
 ``` r
@@ -97,7 +101,8 @@ tokenvars(tok, field = "tag")
 ```
 
 ``` r
-tokenvars(tok, field = "tag", docid = "d1")
-#> $d1
-#> [1] "NNP" "VBZ" "JJ"  "IN"  "JJ"  "JJ"  "NN"  "NN"  "."
+tokenvars(tok, field = "lemma", docid = "d2")
+#> $d2
+#>  [1] "Mr"       "."        "Smith"    "spend"    "two"      "year"    
+#>  [7] "in"       "North"    "Carolina" "."
 ```
