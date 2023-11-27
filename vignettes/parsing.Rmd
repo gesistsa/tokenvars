@@ -1,0 +1,58 @@
+---
+title: "parsing"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{parsing}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(quanteda)
+library(tokenvars)
+```
+
+```r
+## library(udpipe)
+## corpus(data_char_ukimmig2010)
+
+## udmodel <- udpipe_download_model(language = "english-ewt")
+## m_eng_ewt_loaded <- udpipe::udpipe_load_model(file = udmodel)
+## parsed_ukimmig2010 <- udpipe::udpipe_annotate(m_eng_ewt_loaded, data_char_ukimmig2010,
+##                                               doc_id = names(data_char_ukimmig2010)) |>
+##     as.data.frame()
+## parsed_ukimmig2010 <- parsed_ukimmig2010[,-4] ## remove the `sentence` column
+## usethis::use_data(parsed_ukimmig2010)
+```
+
+```{r}
+head(parsed_ukimmig2010)
+```
+
+```{r}
+tok <- as.tokens(split(parsed_ukimmig2010$token, parsed_ukimmig2010$doc_id))
+tok
+```
+
+```{r}
+tokt <- tok %>% tokens_add_tokenvars()
+tokt
+```
+
+```{r}
+## Universal Parts of Speech tag
+tokenvars(tokt, field = "pos") <- split(parsed_ukimmig2010$upos, parsed_ukimmig2010$doc_id)
+tokt
+```
+
+```{r}
+tokenvars(tokt, field = "lemma") <- split(parsed_ukimmig2010$lemma, parsed_ukimmig2010$doc_id)
+tokt
+```
