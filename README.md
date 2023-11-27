@@ -120,7 +120,7 @@ tokenvars(tok, field = "tag")
 ```
 
 ``` r
-tokenvars(tok, field = "lemma", docid = "d2")
+tokenvars(tok, field = "lemma", docnames = "d2")
 #> $d2
 #>  [1] "Mr"       "."        "Smith"    "spend"    "two"      "year"    
 #>  [7] "in"       "North"    "Carolina" "."

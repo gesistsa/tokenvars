@@ -69,5 +69,5 @@ tokenvars(tok, field = "tag")
 ```
 
 ```{r example7}
-tokenvars(tok, field = "lemma", docid = "d2")
+tokenvars(tok, field = "lemma", docnames = "d2")
 ```
