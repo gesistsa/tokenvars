@@ -24,17 +24,17 @@ select_tokenvars <- function(x, field = NULL, user = TRUE, system = FALSE, drop 
 #' @export
 tokenvars <- function(x, field = NULL, docid = NULL, tokenid = NULL) {
     ## place holder; TODO field and tokenid
-    select_tokenvars(attr(x, "tokenvars"), field = field, docid = docid, tokenid = tokenid, drop = TRUE)
+    select_tokenvars(attr(x, "docvars")$tokenvars_, field = field, docid = docid, tokenid = tokenid, drop = TRUE)
 }
 
 #' @export
 "tokenvars<-" <- function(x, field = NULL, value) {
-    x_tokenvars <- attr(x, "tokenvars")
+    x_tokenvars <- attr(x, "docvars")$tokenvars_
     for (i in seq_along(value)) {
         if (length(value[[i]]) != 1 && length(value[[i]]) != nrow(x_tokenvars[[i]])) {
             stop("Mismatch.", call. = TRUE)
         }
-        attr(x, "tokenvars")[[i]][[field]] <- value[[i]]
+        attr(x, "docvars")$tokenvars_[[i]][[field]] <- value[[i]]
     }
     return(x)
 }
@@ -43,7 +43,7 @@ tokenvars <- function(x, field = NULL, docid = NULL, tokenid = NULL) {
 tokens_add_tokenvars <- function(x) {
     unclassed_x <- unclass(x)
     unclassed_x <- add_tokenid(unclassed_x)
-    attr(unclassed_x, "tokenvars") <- make_tokenvars(unclassed_x)
+    attr(unclassed_x, "docvars")$tokenvars_ <- I(make_tokenvars(unclassed_x))
     class(unclassed_x) <- c("tokens_with_tokenvars")
     return(unclassed_x)
 }
@@ -53,7 +53,7 @@ tokens_add_tokenvars <- function(x) {
 #' @export
 as.tokens.tokens_with_tokenvars <- function(x, remove_tokenvars = TRUE, ...) {
     if (remove_tokenvars) {
-        attr(x, "tokenvars") <- NULL
+        attr(x, "docvars")$tokenvars_ <- NULL
     }
     class(x) <- "tokens"
     return(x)
@@ -63,7 +63,8 @@ as.tokens.tokens_with_tokenvars <- function(x, remove_tokenvars = TRUE, ...) {
 #' @method docvars tokens_with_tokenvars
 #' @importFrom quanteda docvars
 docvars.tokens_with_tokenvars <- function(x, field = NULL) {
-    return(docvars(as.tokens(x, remove_tokenvars = FALSE), field = field))
+    ## TODO remove tokenvars_
+    return(docvars(as.tokens(x, remove_tokenvars = TRUE), field = field))
 }
 
 print_item <- function(x, flatten, tokenids) {
