@@ -40,9 +40,9 @@ tokenvars <- function(x, field = NULL, docnames = NULL, tokennames = NULL) {
 }
 
 #' @export
-tokens_add_tokenvars <- function(x) {
+tokens_add_tokenvars <- function(x, tokennames = NULL) {
     unclassed_x <- unclass(x)
-    unclassed_x <- add_tokennames(unclassed_x)
+    unclassed_x <- add_tokennames(unclassed_x, tokennames)
     attr(unclassed_x, "docvars")$tokenvars_ <- I(make_tokenvars(unclassed_x))
     class(unclassed_x) <- c("tokens_with_tokenvars")
     return(unclassed_x)
@@ -143,11 +143,17 @@ make_tokenvars <- function(unclassed_x) {
     return(output)
 }
 
-add_tokennames <- function(unclassed_x) {
+add_tokennames <- function(unclassed_x, tokennames = NULL) {
     ## using attr(vec, "names") as tokennames; apparently, the original implmentation of quanteda::tokens()
     ## doesn't care about those names
+    if (is.null(tokennames)) {
+        for (i in seq_along(unclassed_x)) {
+            attr(unclassed_x[[i]], "names") <- paste0("t", seq_along(unclassed_x[[i]]))
+        }
+        return(unclassed_x)
+    }
     for (i in seq_along(unclassed_x)) {
-        attr(unclassed_x[[i]], "names") <- paste0("t", seq_along(unclassed_x[[i]]))
+        attr(unclassed_x[[i]], "names") <- tokennames[[i]]
     }
     return(unclassed_x)
 }
