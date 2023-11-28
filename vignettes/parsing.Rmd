@@ -56,3 +56,17 @@ tokt
 tokenvars(tokt, field = "lemma") <- split(parsed_ukimmig2010$lemma, parsed_ukimmig2010$doc_id)
 tokt
 ```
+
+Insert multiple fields quickly
+
+```{r}
+tokt <- tok %>% tokens_add_tokenvars()
+## list of data frames
+value <- split(parsed_ukimmig2010[, 6:8], parsed_ukimmig2010$doc_id)
+head(value[[1]])
+```
+
+```{r}
+tokenvars(tokt) <- value
+tokt
+```

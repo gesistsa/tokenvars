@@ -27,14 +27,35 @@ tokenvars <- function(x, field = NULL, docnames = NULL, tokennames = NULL) {
     select_tokenvars(attr(x, "docvars")$tokenvars_, field = field, docnames = docnames, tokennames = tokennames, drop = TRUE)
 }
 
-#' @export
-"tokenvars<-" <- function(x, field = NULL, value) {
+fill_tokenvars_single <- function(x, field, value) {
     x_tokenvars <- attr(x, "docvars")$tokenvars_
     for (i in seq_along(value)) {
         if (length(value[[i]]) != 1 && length(value[[i]]) != nrow(x_tokenvars[[i]])) {
             stop("Mismatch.", call. = TRUE)
         }
         attr(x, "docvars")$tokenvars_[[i]][[field]] <- value[[i]]
+    }
+    return(x)
+}
+
+#' @export
+"tokenvars<-" <- function(x, field = NULL, value) {
+    if (!is.list(value)) {
+        stop("`value` must be a list (at the moment).")
+    }
+    if (!is.null(field)) {
+        return(fill_tokenvars_single(x, field = field, value = value))
+    }
+    if (!all(vapply(value, is.data.frame, TRUE))) {
+        stop("When `field` is `NULL`, `value` must be a list of data frames.", call. = FALSE)
+    }
+    x_tokenvars <- attr(x, "docvars")$tokenvars_
+    for (i in seq_along(value)) {
+        if (nrow(value[[i]]) != nrow(x_tokenvars[[i]])) {
+            stop("Mismatch.", call. = TRUE)
+        }
+        ## TODO check duplicated column names
+        attr(x, "docvars")$tokenvars_[[i]] <- cbind(attr(x, "docvars")$tokenvars_[[i]], value[[i]])
     }
     return(x)
 }
