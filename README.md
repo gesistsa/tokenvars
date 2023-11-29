@@ -23,6 +23,10 @@ tokens); it is also useful to store upper-level information of tokens
 “tement”; you might want to know “\_L” is from the French word
 “*L’appartement*”).
 
+This is a generalization of the approach used in
+[quanteda.proximity](https://github.com/gesistsa/quanteda.proximity) for
+recording token-level metadata.
+
 ## Installation
 
 You can install the development version of tokenvars like so:

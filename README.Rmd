@@ -22,6 +22,8 @@ At the moment, this package is super experimental and cannot be considered easy 
 
 `quanteda` has good support for metadata. However, one can only put corpus- and document-level metadata (`meta()`, `docvars()`, respectively). This package aims at going down one level and provides support for token-level metadata. Token-level metadata is useful for tagging individual token (e.g. Parts of Speech, relationships among tokens); it is also useful to store upper-level information of tokens (e.g. the subword tokenized sequence of tokens "\_L", "'", "app", "ar", "tement"; you might want to know "\_L" is from the French word "*L'appartement*").
 
+This is a generalization of the approach used in [quanteda.proximity](https://github.com/gesistsa/quanteda.proximity) for recording token-level metadata.
+
 ## Installation
 
 You can install the development version of tokenvars like so:
