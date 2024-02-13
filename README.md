@@ -23,10 +23,6 @@ tokens); it is also useful to store upper-level information of tokens
 “tement”; you might want to know “\_L” is from the French word
 “*L’appartement*”).
 
-This is a generalization of the approach used in
-[quanteda.proximity](https://github.com/gesistsa/quanteda.proximity) for
-recording token-level metadata.
-
 ## Installation
 
 You can install the development version of tokenvars like so:
@@ -35,9 +31,7 @@ You can install the development version of tokenvars like so:
 # Well, if you don't know how to do this, you probably shouldn't try this.
 ```
 
-## Proof of concept
-
-This is a basic example which shows you how to solve a common problem:
+## A demo of using token-level metadata
 
 ``` r
 library(quanteda)
@@ -53,7 +47,7 @@ corp <- corpus(c(d1 = "spaCy is great at fast natural language processing.",
 
 tok <- tokens(corp) %>% tokens_add_tokenvars()
 tok
-#> Tokens consisting of 2 documents.
+#> Tokens consisting of 2 documents and 1 docvar.
 #> d1 :
 #> t1>"spaCy" t2>"is" t3>"great" t4>"at" t5>"fast" t6>"natural" t7>"language" t8>"processing" t9>"." 
 #> d2 :
@@ -78,7 +72,7 @@ tokenvars(tok, "lemma") <- list(c("spaCy", "be", "great", "at", "fast", "natural
 
 ``` r
 tok
-#> Tokens consisting of 2 documents.
+#> Tokens consisting of 2 documents and 1 docvar.
 #> Token variables: (tag|lemma).
 #> d1 :
 #> t1>"spaCy"(NNP|spaCy) t2>"is"(VBZ|be) t3>"great"(JJ|great) t4>"at"(IN|at) t5>"fast"(JJ|fast) t6>"natural"(JJ|natural) t7>"language"(NN|language) t8>"processing"(NN|processing) t9>"."(.|.) 
@@ -128,4 +122,84 @@ tokenvars(tok, field = "lemma", docnames = "d2")
 #> $d2
 #>  [1] "Mr"       "."        "Smith"    "spend"    "two"      "year"    
 #>  [7] "in"       "North"    "Carolina" "."
+```
+
+## tokens\_proximity
+
+`tokens_proxmity` is a showcase of `tokenvars` for calculating and
+manipulating a token-level metadata. “proximity” is a token-level
+metadata of the distance between a target pattern and all other tokens.
+
+``` r
+txt1 <-
+c("Turkish President Tayyip Erdogan, in his strongest comments yet on the Gaza conflict, said on Wednesday the Palestinian militant group Hamas was not a terrorist organisation but a liberation group fighting to protect Palestinian lands.",
+"EU policymakers proposed the new agency in 2021 to stop financial firms from aiding criminals and terrorists. Brussels has so far relied on national regulators with no EU authority to stop money laundering and terrorist financing running into billions of euros.")
+tok1 <- txt1 %>% tokens() %>%
+    tokens_proximity(pattern = "turkish")
+tok1
+#> Tokens consisting of 2 documents and 1 docvar.
+#> Token variables: (proximity).
+#> text1 :
+#> t1>"turkish"(1) t2>"president"(2) t3>"tayyip"(3) t4>"erdogan"(4) t5>","(5) t6>"in"(6) t7>"his"(7) t8>"strongest"(8) t9>"comments"(9) t10>"yet"(10) t11>"on"(11) t12>"the"(12) { ... and 26 more }
+#> 
+#> text2 :
+#> t1>"eu"(44) t2>"policymakers"(44) t3>"proposed"(44) t4>"the"(44) t5>"new"(44) t6>"agency"(44) t7>"in"(44) t8>"2021"(44) t9>"to"(44) t10>"stop"(44) t11>"financial"(44) t12>"firms"(44) { ... and 31 more }
+```
+
+``` r
+tokenvars(tok1, "proximity")
+#> $text1
+#>  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25
+#> [26] 26 27 28 29 30 31 32 33 34 35 36 37 38
+#> 
+#> $text2
+#>  [1] 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44
+#> [26] 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44
+```
+
+The `tokens` object with proximity vectors can be converted to a
+(weighted) `dfm` (Document-Feature Matrix). The default weight is
+assigned by inverting the proximity.
+
+``` r
+dfm(tok1)
+#> Document-feature matrix of: 2 documents, 64 features (45.31% sparse) and 0 docvars.
+#>        features
+#> docs    turkish president    tayyip erdogan         ,         in       his
+#>   text1       1       0.5 0.3333333    0.25 0.2666667 0.16666667 0.1428571
+#>   text2       0       0   0            0    0         0.02272727 0        
+#>        features
+#> docs    strongest  comments yet
+#>   text1     0.125 0.1111111 0.1
+#>   text2     0     0         0  
+#> [ reached max_nfeat ... 54 more features ]
+```
+
+You have the freedom to change to another weight function. For example,
+not inverting.
+
+``` r
+dfm(tok1, weight_function = identity)
+#> Document-feature matrix of: 2 documents, 64 features (45.31% sparse) and 0 docvars.
+#>        features
+#> docs    turkish president tayyip erdogan  , in his strongest comments yet
+#>   text1       1         2      3       4 20  6   7         8        9  10
+#>   text2       0         0      0       0  0 44   0         0        0   0
+#> [ reached max_nfeat ... 54 more features ]
+```
+
+Or any custom function
+
+``` r
+dfm(tok1, weight_function = function(x) { 1 / x^2 })
+#> Document-feature matrix of: 2 documents, 64 features (45.31% sparse) and 0 docvars.
+#>        features
+#> docs    turkish president    tayyip erdogan          ,           in        his
+#>   text1       1      0.25 0.1111111  0.0625 0.04444444 0.0277777778 0.02040816
+#>   text2       0      0    0          0      0          0.0005165289 0         
+#>        features
+#> docs    strongest   comments  yet
+#>   text1  0.015625 0.01234568 0.01
+#>   text2  0        0          0   
+#> [ reached max_nfeat ... 54 more features ]
 ```

@@ -22,8 +22,6 @@ At the moment, this package is super experimental and cannot be considered easy 
 
 `quanteda` has good support for metadata. However, one can only put corpus- and document-level metadata (`meta()`, `docvars()`, respectively). This package aims at going down one level and provides support for token-level metadata. Token-level metadata is useful for tagging individual token (e.g. Parts of Speech, relationships among tokens); it is also useful to store upper-level information of tokens (e.g. the subword tokenized sequence of tokens "\_L", "'", "app", "ar", "tement"; you might want to know "\_L" is from the French word "*L'appartement*").
 
-This is a generalization of the approach used in [quanteda.proximity](https://github.com/gesistsa/quanteda.proximity) for recording token-level metadata.
-
 ## Installation
 
 You can install the development version of tokenvars like so:
@@ -32,9 +30,7 @@ You can install the development version of tokenvars like so:
 # Well, if you don't know how to do this, you probably shouldn't try this.
 ```
 
-## Proof of concept
-
-This is a basic example which shows you how to solve a common problem:
+## A demo of using token-level metadata
 
 ```{r example}
 library(quanteda)
@@ -73,3 +69,43 @@ tokenvars(tok, field = "tag")
 ```{r example7}
 tokenvars(tok, field = "lemma", docnames = "d2")
 ```
+
+## tokens_proximity
+
+`tokens_proxmity` is a showcase of `tokenvars` for calculating and manipulating a token-level metadata. "proximity" is a token-level metadata of the distance between a target pattern and all other tokens.
+
+
+```{r prox1}
+txt1 <-
+c("Turkish President Tayyip Erdogan, in his strongest comments yet on the Gaza conflict, said on Wednesday the Palestinian militant group Hamas was not a terrorist organisation but a liberation group fighting to protect Palestinian lands.",
+"EU policymakers proposed the new agency in 2021 to stop financial firms from aiding criminals and terrorists. Brussels has so far relied on national regulators with no EU authority to stop money laundering and terrorist financing running into billions of euros.")
+tok1 <- txt1 %>% tokens() %>%
+    tokens_proximity(pattern = "turkish")
+tok1
+```
+
+```{r prox2}
+tokenvars(tok1, "proximity")
+```
+
+
+
+The `tokens` object with proximity vectors can be converted to a (weighted) `dfm` (Document-Feature Matrix). The default weight is assigned by inverting the proximity.
+
+```{r dfm}
+dfm(tok1)
+```
+
+
+You have the freedom to change to another weight function. For example, not inverting.
+
+```{r dfm2}
+dfm(tok1, weight_function = identity)
+```
+
+Or any custom function
+
+```{r dfm3}
+dfm(tok1, weight_function = function(x) { 1 / x^2 })
+```
+
