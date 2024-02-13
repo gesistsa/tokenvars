@@ -178,3 +178,17 @@ add_tokennames <- function(unclassed_x, tokennames = NULL) {
     }
     return(unclassed_x)
 }
+
+#' @importFrom quanteda docvars
+#' @method docvars tokens_with_tokenvars
+#' @export
+docvars.tokens_with_tokenvars <- function(x, field = NULL) {
+    return(quanteda::docvars(as.tokens(x, remove_tokenvars = FALSE), field = field))
+}
+
+#' @importFrom quanteda meta
+#' @method meta tokens_with_tokenvars
+#' @export
+meta.tokens_with_tokenvars <- function(x, field = NULL, type = c("user", "object", "system", "all")) {
+    return(quanteda::meta(as.tokens(x, remove_tokenvars = FALSE), field = field, type = type))
+}
