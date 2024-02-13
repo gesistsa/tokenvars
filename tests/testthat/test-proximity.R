@@ -72,3 +72,84 @@ test_that("phrase", {
     expect_error("Seid ihr das Essen? Nein, wir sind die Jäger." %>% tokens() %>% tokens_proximity(phrase("das Essen")) -> res, NA)
     expect_equal(tokenvars(res, "proximity")$text1, c(3,2,1,1,2,3,4,5,6,7,8,9))
 })
+
+## dfm
+
+test_that("normal", {
+    suppressPackageStartupMessages(library(quanteda))
+    testdata <-
+        c("Turkish President Tayyip Erdogan, in his strongest comments yet on the Gaza conflict, said on Wednesday the Palestinian militant group Hamas was not a terrorist organisation but a liberation group fighting to protect Palestinian lands.")
+    res <- testdata %>% tokens() %>% tokens_proximity(pattern = "turkish")
+    res %>% dfm() -> output
+    expect_equal(as.numeric(output[1,"in"]), 0.166666, tolerance = 0.0001)
+})
+
+test_that("weight function", {
+    suppressPackageStartupMessages(library(quanteda))
+    testdata <-
+        c("Turkish President Tayyip Erdogan, in his strongest comments yet on the Gaza conflict, said on Wednesday the Palestinian militant group Hamas was not a terrorist organisation but a liberation group fighting to protect Palestinian lands.")
+    res <- testdata %>% tokens() %>% tokens_proximity(pattern = "turkish")
+    res %>% dfm(weight_function = identity) -> output2
+    expect_equal(as.numeric(output2[1,","]), 20, tolerance = 0.0001)
+})
+
+test_that("tolower", {
+    suppressPackageStartupMessages(library(quanteda))
+    testdata <-
+        c("Turkish President Tayyip Erdogan, in his strongest comments yet on the Gaza conflict, said on Wednesday the Palestinian militant group Hamas was not a terrorist organisation but a liberation group fighting to protect Palestinian lands.")
+    res <- testdata %>% tokens() %>% tokens_proximity(pattern = "turkish", tolower = FALSE)
+    res %>% dfm(tolower = TRUE) -> output
+    expect_true("turkish" %in% colnames(output))
+    res %>% dfm(tolower = FALSE) -> output
+    expect_false("turkish" %in% colnames(output))
+    res <- testdata %>% tokens() %>% tokens_proximity(pattern = phrase("Tayyip Erdogan"), tolower = FALSE)
+    res %>% dfm(tolower = TRUE) -> output
+    expect_true("turkish" %in% colnames(output))
+})
+
+test_that("Padding #46", {
+    suppressPackageStartupMessages(library(quanteda))
+    toks <- tokens(c("a b c", "A B C D")) %>% tokens_remove("b", padding = TRUE)
+    expect_error(toks %>% tokens_proximity("a") %>% dfm(), NA)
+})
+
+test_that("remove_padding", {
+    suppressPackageStartupMessages(library(quanteda))
+    toks <- tokens(c("a b c", "A B C D")) %>% tokens_remove("b", padding = TRUE)
+    output <- toks %>% tokens_proximity("a") %>% dfm()
+    expect_true("" %in% colnames(output))
+    output <- toks %>% tokens_proximity("a") %>% dfm(remove_padding = TRUE)
+    expect_false("" %in% colnames(output))
+})
+
+## infra
+
+test_that("docvars retention", {
+    suppressPackageStartupMessages(library(quanteda))
+    test <- c("hello world!")
+    corpus(test, docvars = data.frame(dummy = TRUE)) -> test_corpus
+    meta(test_corpus, "what") <- "test"
+    expect_equal(test_corpus %>% tokens() %>% dfm() %>% docvars("dummy"), TRUE)
+    expect_equal(test_corpus %>% tokens() %>% tokens_proximity(pattern = "world") %>% dfm() %>% docvars("dummy"), TRUE)
+    ## remove_docvars_dist
+    docvars_cols <- test_corpus %>% tokens() %>% tokens_proximity(pattern = "world") %>% dfm(remove_tokenvars = FALSE) %>% docvars() %>% colnames()
+    expect_true("tokenvars_" %in% docvars_cols)
+    docvars_cols <- test_corpus %>% tokens() %>% tokens_proximity(pattern = "world") %>% dfm(remove_tokenvars = TRUE) %>% docvars() %>% colnames()
+    expect_false("tokenvars" %in% docvars_cols)
+})
+
+test_that("meta retention", {
+    suppressPackageStartupMessages(library(quanteda))
+    test <- c("hello world!")
+    corpus(test, docvars = data.frame(dummy = TRUE)) -> test_corpus
+    meta(test_corpus, "what") <- "test"
+    expect_equal(test_corpus %>% tokens() %>% dfm() %>% meta("what"), "test")
+    expect_equal(test_corpus %>% tokens() %>% tokens_proximity(pattern = "world") %>% dfm() %>% meta("what"), "test")
+})
+
+test_that("docvars and meta methods", {
+    suppressPackageStartupMessages(library(quanteda))
+    test <- c("hello world!")
+    expect_equal(tokens(test) %>% tokens_proximity("world") %>% docvars() %>% colnames(), "tokenvars_")
+    expect_error(tokens(test) %>% tokens_proximity("world") %>% meta(), NA)
+})

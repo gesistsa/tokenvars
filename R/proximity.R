@@ -202,7 +202,7 @@ catm <- function(..., sep = " ", appendLF = FALSE) {
 #' @param x output of [tokens_proximity()].
 #' @param tolower convert all features to lowercase.
 #' @param remove_padding logical; if `TRUE`, remove the "pads" left as empty tokens after calling [quanteda::tokens()] or [quanteda::tokens_remove()] with `padding = TRUE`.
-#' @param remove_docvars_proximity logical, remove the "proximity" document variable.
+#' @param remove_tokenvars logical, remove tokenvars in the returned dfm.
 #' @param verbose  display messages if `TRUE`.
 #' @param weight_function a weight function, default to invert distance,
 #' @param ... not used.
@@ -236,7 +236,7 @@ catm <- function(..., sep = " ", appendLF = FALSE) {
 #' @method dfm tokens_with_proximity
 #' @export
 dfm.tokens_with_proximity <- function(x, tolower = TRUE, remove_padding = FALSE,
-                                      verbose = quanteda::quanteda_options("verbose"), remove_docvars_proximity = TRUE,
+                                      verbose = quanteda::quanteda_options("verbose"), remove_tokenvars = TRUE,
                                       weight_function = function(x) {
                                           1 / x
                                       }, ...) {
@@ -258,9 +258,9 @@ dfm.tokens_with_proximity <- function(x, tolower = TRUE, remove_padding = FALSE,
             catm("Only the minimum proximity is used.\n")
         }
         count_from <- meta(x, "count_from")
-        attr(x, "docvars")$proximity <- lapply(quanteda::docvars(x, "proximity"), function(y) row_mins_c(y) + count_from)
+        tokenvars(x, "proximity") <- lapply(tokenvars(x, "proximity"), function(y) row_mins_c(y) + count_from)
     }
-    val <- weight_function(unlist(quanteda::docvars(x, "proximity"), use.names = FALSE))
+    val <- weight_function(unlist(tokenvars(x, "proximity"), use.names = FALSE))
     temp <- Matrix::sparseMatrix(
         j = index,
         p = cumsum(c(1L, lengths(x))) - 1L,
@@ -273,8 +273,8 @@ dfm.tokens_with_proximity <- function(x, tolower = TRUE, remove_padding = FALSE,
     )
     output <- quanteda::as.dfm(temp)
     attributes(output)[["meta"]] <- x_attrs[["meta"]]
-    if (remove_docvars_proximity) {
-        x_docvars$proximity <- NULL
+    if (remove_tokenvars) {
+        x_docvars$tokenvars_ <- NULL
     }
     quanteda::docvars(output) <- x_docvars
     if (remove_padding) {

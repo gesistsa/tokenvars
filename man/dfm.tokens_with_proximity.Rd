@@ -9,7 +9,7 @@
   tolower = TRUE,
   remove_padding = FALSE,
   verbose = quanteda::quanteda_options("verbose"),
-  remove_docvars_proximity = TRUE,
+  remove_tokenvars = TRUE,
   weight_function = function(x) {
      1/x
  },
@@ -25,7 +25,7 @@
 
 \item{verbose}{display messages if \code{TRUE}.}
 
-\item{remove_docvars_proximity}{logical, remove the "proximity" document variable.}
+\item{remove_tokenvars}{logical, remove tokenvars in the returned dfm.}
 
 \item{weight_function}{a weight function, default to invert distance,}
 
