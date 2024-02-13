@@ -116,7 +116,7 @@ tokens_proximity <- function(x, pattern, get_min = TRUE, valuetype = c("glob", "
     quanteda::meta(toks, field = "count_from") <- count_from
     quanteda::meta(toks, field = "tolower") <- tolower
     quanteda::meta(toks, field = "keep_acronyms") <- keep_acronyms
-    toks <- tokens_add_tokenvars(x)
+    toks <- tokens_add_tokenvars(toks)
     tokenvars(toks, "proximity") <- proximity
     class(toks) <- append(class(toks), c("tokens_with_proximity"))
     return(toks)
@@ -173,7 +173,7 @@ convert.tokens_with_proximity <- function(x, to = c("data.frame"), ...) {
     result_list <- mapply(
         FUN = convert_df,
         tokens_obj = as.list(x),
-        proximity_obj = quanteda::docvars(x, "proximity"),
+        proximity_obj = tokenvars(x, "proximity"),
         doc_id = x_docnames,
         SIMPLIFY = FALSE, USE.NAMES = FALSE
     )
